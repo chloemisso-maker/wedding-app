@@ -245,10 +245,34 @@ function App() {
           </p>
         )}
       </section>
-
+       <div className="section-heart" aria-hidden="true">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          width="34"
+          height="34"
+        >
+          <path
+            d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"
+            fill="currentColor"
+          />
+        </svg>
+      </div>
       <section className="upload-placeholder">
         <h2>Revivez les souvenirs</h2>
-
+        <div className="section-heart" aria-hidden="true">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          width="34"
+          height="34"
+        >
+          <path
+            d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"
+            fill="currentColor"
+          />
+        </svg>
+      </div>
         <p className="welcome-message">
           Retrouvez les photos partagées par tous les invités et
           téléchargez celles que vous souhaitez conserver.
