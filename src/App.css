@@ -1,0 +1,316 @@
+
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Montserrat:wght@400;500;600&display=swap");
+
+:root {
+  font-family: "Montserrat", sans-serif;
+  color: #fffdf4;
+  background: #354d25;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button {
+  font: inherit;
+}
+
+.home-page {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  overflow: hidden;
+  background-image: url("./assets/chateau.png");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+.home-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    135deg,
+    rgba(27, 39, 20, 0.45),
+    rgba(27, 39, 20, 0.72)
+  );
+}
+
+.welcome-card {
+  min-height: auto;
+  padding: 64px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.wedding-logo {
+  display: block;
+  width: min(230px, 65vw);
+  height: auto;
+  margin-bottom: 22px;
+  border-radius: 4px;
+}
+
+.wedding-date {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.65rem;
+  letter-spacing: 0.12em;
+  margin: 0 0 26px;
+}
+
+.welcome-divider {
+  width: 64px;
+  height: 1px;
+  background: #f5f5dc;
+  margin-bottom: 26px;
+}
+
+.welcome-card h1,
+.upload-placeholder h2 {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 500;
+}
+
+.welcome-card h1 {
+  font-size: clamp(2rem, 5vw, 3.3rem);
+  line-height: 1.15;
+  margin: 0;
+}
+
+.welcome-heart {
+  color: #f5f5dc;
+  font-size: 1.6rem;
+  margin: 18px 0;
+}
+
+.welcome-message {
+  max-width: 520px;
+  font-size: 1rem;
+  line-height: 1.8;
+  margin: 8px 0;
+}
+
+.upload-button {
+  margin-top: 30px;
+  padding: 15px 28px;
+  border: 1px solid #f5f5dc;
+  border-radius: 3px;
+  color: #354d25;
+  background: #f5f5dc;
+  cursor: pointer;
+  transition: background 180ms ease, color 180ms ease;
+}
+
+.upload-button:hover {
+  color: #f5f5dc;
+  background: #354d25;
+}
+
+.upload-placeholder {
+  padding: 70px 24px;
+  text-align: center;
+  background: #f5f5dc;
+  color: #354d25;
+}
+
+.upload-placeholder h2 {
+  font-size: 2.5rem;
+  margin-top: 0;
+}
+
+@media (max-width: 600px) {
+  .home-page {
+    background-attachment: scroll;
+    background-position: center;
+  }
+
+  .welcome-card {
+    padding: 44px 24px;
+  }
+
+  .wedding-date {
+    font-size: 1.35rem;
+  }
+
+  .welcome-message {
+    font-size: 0.94rem;
+  }
+}
+
+.upload-placeholder {
+  position: relative;
+  z-index: 1;
+  width: min(900px, calc(100% - 40px));
+  margin: 20px auto 50px;
+  padding: 40px 28px;
+  box-sizing: border-box;
+  border-radius: 12px;
+  background: #f5f2e9;
+  color: #354d25;
+  text-align: center;
+}
+
+.upload-placeholder h2 {
+  margin-top: 0;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 2.3rem;
+  font-weight: 500;
+}
+
+.upload-intro {
+  max-width: 560px;
+  margin: 0 auto 24px;
+  line-height: 1.7;
+}
+
+.choose-photos-button,
+.send-photos-button {
+  display: inline-block;
+  padding: 15px 28px;
+  border: 1px solid #354d25;
+  border-radius: 5px;
+  background: #354d25;
+  color: #fffdf5;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.choose-photos-button:hover,
+.send-photos-button:hover {
+  background: #fffdf5;
+  color: #354d25;
+}
+
+.choose-photos-button:disabled,
+.send-photos-button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.photo-input {
+  display: none;
+}
+
+.upload-hint {
+  margin-top: 14px;
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.selected-count {
+  margin-top: 28px;
+  font-weight: 600;
+}
+
+.photo-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 16px;
+  margin: 24px 0;
+  text-align: left;
+}
+
+.photo-preview {
+  position: relative;
+  min-width: 0;
+}
+
+.photo-preview img {
+  display: block;
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.photo-preview span {
+  display: block;
+  margin-top: 7px;
+  overflow-wrap: anywhere;
+  font-size: 0.8rem;
+}
+
+.remove-photo-button {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: #fffdf5;
+  color: #354d25;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.send-photos-button {
+  display: block;
+  margin: 20px auto 0;
+}
+
+.upload-status {
+  max-width: 600px;
+  margin: 22px auto 0;
+  line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+  .upload-placeholder {
+    width: calc(100% - 24px);
+    margin: 28px auto;
+    padding: 28px 18px;
+  }
+
+  .photo-preview-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .photo-preview img {
+    height: 120px;
+  }
+
+  .choose-photos-button,
+  .send-photos-button {
+    max-width: 100%;
+  }
+}
+
+
+.upload-placeholder {
+  text-align: center;
+}
+
+.upload-placeholder .welcome-message {
+  width: 100%;
+  max-width: 600px;
+  margin: 12px auto;
+  text-align: center;
+  line-height: 1.7;
+}
+
+.welcome-card {
+  padding-bottom: 16px;
+}

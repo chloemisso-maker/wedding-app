@@ -1,0 +1,191 @@
+
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Montserrat:wght@400;500;600&display=swap");
+
+:root {
+  font-family: "Montserrat", sans-serif;
+  color: #fffdf4;
+  background: #354d25;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button {
+  font: inherit;
+}
+
+.home-page {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  overflow: hidden;
+  background-image: url("./assets/chateau.png");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+.home-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    135deg,
+    rgba(27, 39, 20, 0.45),
+    rgba(27, 39, 20, 0.72)
+  );
+}
+
+.welcome-card {
+  min-height: 100vh;
+  padding: 64px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.wedding-logo {
+  display: block;
+  width: min(230px, 65vw);
+  height: auto;
+  margin-bottom: 22px;
+  border-radius: 4px;
+}
+
+.wedding-date {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.65rem;
+  letter-spacing: 0.12em;
+  margin: 0 0 26px;
+}
+
+.welcome-divider {
+  width: 64px;
+  height: 1px;
+  background: #f5f5dc;
+  margin-bottom: 26px;
+}
+
+.welcome-card h1,
+.upload-placeholder h2 {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 500;
+}
+
+.welcome-card h1 {
+  font-size: clamp(2rem, 5vw, 3.3rem);
+  line-height: 1.15;
+  margin: 0;
+}
+
+.welcome-heart {
+  color: #f5f5dc;
+  font-size: 1.6rem;
+  margin: 18px 0;
+}
+
+.welcome-message {
+  max-width: 520px;
+  font-size: 1rem;
+  line-height: 1.8;
+  margin: 8px 0;
+}
+
+
+.upload-button {
+  margin-top: 34px;
+  padding: 20px 42px;
+  min-width: 280px;
+  border: 1px solid #354d25;
+  border-radius: 4px;
+  color: #f5f5dc;
+  background: #354d25;
+  font-size: 1.15rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  transition:
+    background 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.upload-button:hover {
+  color: #354d25;
+  background: #f5f5dc;
+  transform: translateY(-2px);
+}
+
+.upload-button:focus-visible {
+  outline: 3px solid #f5f5dc;
+  outline-offset: 4px;
+}
+
+@media (max-width: 600px) {
+  .upload-button {
+    width: 100%;
+    max-width: 340px;
+    min-width: 0;
+    padding: 19px 24px;
+    font-size: 1.05rem;
+  }
+}
+
+
+.upload-placeholder {
+  padding: 70px 24px;
+  text-align: center;
+  background: #f5f5dc;
+  color: #354d25;
+}
+
+.upload-placeholder h2 {
+  font-size: 2.5rem;
+  margin-top: 0;
+}
+
+@media (max-width: 600px) {
+  .home-page {
+    background-attachment: scroll;
+    background-position: center;
+  }
+
+  .welcome-card {
+    padding: 50px 30px;
+  }
+
+  .wedding-date {
+    font-size: 1.35rem;
+  }
+
+  .welcome-message {
+    font-size: 0.94rem;
+  }
+}
+.home-page {
+  row-gap: 0;
+}
+
+.upload-placeholder {
+  margin-top: 25px;
+}
