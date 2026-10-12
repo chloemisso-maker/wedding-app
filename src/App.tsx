@@ -4,7 +4,7 @@ import "./App.css";
 import logo from "./assets/logo.png";
 
 const API_URL =
-  "https://script.google.com/macros/s/AKfycbz5cPdBB1xb7hWtKCwV1dokX9rcFG9clcQwZQcgeAJR87Ic9_BYbKJufLuYiSWD-tty/exec";
+  "https://script.google.com/macros/s/AKfycbz5cPdBB1xb7hWtKCwV1dokX9rcFG9clcQwZQcgeAJR87Ic9_BYbKJufLuYiSW-Dtty/exec";
 
 const MAX_FILES = 10;
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -19,16 +19,20 @@ function fileToBase64(file: File): Promise<string> {
       resolve(result.split(",")[1] ?? "");
     };
 
-    reader.onerror = () => reject(new Error("Impossible de lire une photo."));
+    reader.onerror = () =>
+      reject(new Error("Impossible de lire une photo."));
+
     reader.readAsDataURL(file);
   });
 }
 
 function App() {
   const inputRef = useRef<HTMLInputElement>(null);
+
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [status, setStatus] = useState("");
   const [isUploading, setIsUploading] = useState(false);
+  const [showGallery, setShowGallery] = useState(false);
 
   const previews = useMemo(
     () =>
@@ -59,18 +63,23 @@ function App() {
     }
 
     if (incoming.some((file) => file.size > MAX_FILE_SIZE)) {
-      setStatus("Chaque photo doit peser 4 Mo maximum.");
+      setStatus("Chaque photo doit peser 10 Mo maximum.");
       return;
     }
 
     const combined = [...selectedFiles, ...incoming];
 
     if (combined.length > MAX_FILES) {
-      setStatus(`Vous pouvez sélectionner ${MAX_FILES} photos maximum.`);
+      setStatus(`Vous pouvez sélectionner ${MAX_FILES} photos maximum par envoi.`);
       return;
     }
 
-    if (combined.reduce((sum, file) => sum + file.size, 0) > MAX_TOTAL_SIZE) {
+    const totalSize = combined.reduce(
+      (sum, file) => sum + file.size,
+      0
+    );
+
+    if (totalSize > MAX_TOTAL_SIZE) {
       setStatus("Le poids total des photos ne doit pas dépasser 30 Mo.");
       return;
     }
@@ -80,7 +89,9 @@ function App() {
   }
 
   function removeFile(index: number) {
-    setSelectedFiles((current) => current.filter((_, i) => i !== index));
+    setSelectedFiles((current) =>
+      current.filter((_, i) => i !== index)
+    );
     setStatus("");
   }
 
@@ -101,8 +112,6 @@ function App() {
 
       setStatus("Envoi en cours…");
 
-      // Le mode no-cors permet d'envoyer la requête sans lire
-      // directement la réponse du serveur Google Apps Script.
       await fetch(API_URL, {
         method: "POST",
         mode: "no-cors",
@@ -112,9 +121,7 @@ function App() {
         body: JSON.stringify({ files }),
       });
 
-      setStatus(
-        "Vos photos ont bien été envoyées. Merci !"
-      );
+      setStatus("Vos photos ont bien été envoyées. Merci !");
       setSelectedFiles([]);
     } catch {
       setStatus(
@@ -130,7 +137,11 @@ function App() {
       <div className="home-overlay" />
 
       <section className="welcome-card">
-        <img className="wedding-logo" src={logo} alt="Julie et Louis" />
+        <img
+          className="wedding-logo"
+          src={logo}
+          alt="Julie et Louis"
+        />
 
         <p className="wedding-date">17 octobre 2026</p>
 
@@ -149,21 +160,19 @@ function App() {
             fill="#f5f5dc"
           />
         </svg>
-
-
       </section>
 
       <section id="upload-section" className="upload-placeholder">
         <h2>Vos souvenirs</h2>
 
-      <p className="welcome-message">
-        Chaque photo compte énormément.
-      </p>
+        <p className="welcome-message">
+          Chaque photo compte énormément.
+        </p>
 
-<p className="welcome-message">
-  Nous serions ravis de récupérer tous les petits moments que vous avez
-  capturés.
-</p>
+        <p className="welcome-message">
+          Nous serions ravis de récupérer tous les petits moments que
+          vous avez capturés.
+        </p>
 
         <button
           type="button"
@@ -184,7 +193,8 @@ function App() {
         />
 
         <p className="upload-hint">
-          Jusqu'à 10 photos par envoi · 10 Mo maximum par photo
+          Jusqu'à 10 photos par envoi · 10 Mo maximum par photo ·
+          30 Mo au total
         </p>
 
         {previews.length > 0 && (
@@ -195,8 +205,15 @@ function App() {
 
             <div className="photo-preview-grid">
               {previews.map((preview, index) => (
-                <div className="photo-preview" key={`${preview.file.name}-${index}`}>
-                  <img src={preview.url} alt={preview.file.name} />
+                <div
+                  className="photo-preview"
+                  key={`${preview.file.name}-${index}`}
+                >
+                  <img
+                    src={preview.url}
+                    alt={preview.file.name}
+                  />
+
                   <button
                     type="button"
                     className="remove-photo-button"
@@ -206,6 +223,7 @@ function App() {
                   >
                     ×
                   </button>
+
                   <span>{preview.file.name}</span>
                 </div>
               ))}
@@ -222,32 +240,50 @@ function App() {
           </>
         )}
 
-        {status && status !== "Envoi en cours…" && (
+        {status && (
           <p className="upload-status" role="status">
             {status}
-         </p>
+          </p>
         )}
-
       </section>
 
       <section className="upload-placeholder">
         <h2>Revivez les souvenirs</h2>
 
         <p className="welcome-message">
-          Retrouvez les photos partagées par tous les invités
-          et téléchargez celles que vous souhaitez conserver.
+          Retrouvez les photos partagées par tous les invités et
+          téléchargez celles que vous souhaitez conserver.
         </p>
 
         <button
           type="button"
           className="choose-photos-button"
-          onClick={() => window.open(API_URL, "_blank", "noopener,noreferrer")}
+          onClick={() => setShowGallery((visible) => !visible)}
+          aria-expanded={showGallery}
         >
-          Découvrir les photos du mariage
+          {showGallery
+            ? "Masquer la galerie"
+            : "Découvrir les photos du mariage"}
         </button>
+
+        {showGallery && (
+          <iframe
+            title="Galerie photos de Julie et Louis"
+            src={API_URL}
+            style={{
+              display: "block",
+              width: "100%",
+              height: "850px",
+              border: 0,
+              borderRadius: "12px",
+              marginTop: "24px",
+              background: "#f8f5ed",
+            }}
+            loading="lazy"
+          />
+        )}
       </section>
     </main>
-
   );
 }
 
