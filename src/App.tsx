@@ -184,7 +184,7 @@ function App() {
         />
 
         <p className="upload-hint">
-          Jusqu'à 20 photos par envoi · 30 Mo maximum par photo
+          Jusqu'à 20 photos par envoi · 10 Mo maximum par photo
         </p>
 
         {previews.length > 0 && (
