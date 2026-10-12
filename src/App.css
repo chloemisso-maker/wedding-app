@@ -316,3 +316,12 @@ button {
 .welcome-card {
   padding-bottom: 16px;
 }
+
+
+.section-heart {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #344b3b;
+  margin: 28px auto;
+}
