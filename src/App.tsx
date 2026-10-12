@@ -6,7 +6,7 @@ import logo from "./assets/logo.png";
 const API_URL =
   "https://script.google.com/macros/s/AKfycbz5cPdBB1xb7hWtKCwV1dokX9rcFG9clcQwZQcgeAJR87Ic9_BYbKJufLuYiSWD-tty/exec";
 
-const MAX_FILES = 20;
+const MAX_FILES = 10;
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const MAX_TOTAL_SIZE = 30 * 1024 * 1024;
 
@@ -71,7 +71,7 @@ function App() {
     }
 
     if (combined.reduce((sum, file) => sum + file.size, 0) > MAX_TOTAL_SIZE) {
-      setStatus("Le poids total des photos ne doit pas dépasser 12 Mo.");
+      setStatus("Le poids total des photos ne doit pas dépasser 30 Mo.");
       return;
     }
 
@@ -184,7 +184,7 @@ function App() {
         />
 
         <p className="upload-hint">
-          Jusqu'à 20 photos par envoi · 10 Mo maximum par photo
+          Jusqu'à 10 photos par envoi · 10 Mo maximum par photo
         </p>
 
         {previews.length > 0 && (
@@ -227,8 +227,27 @@ function App() {
             {status}
          </p>
         )}
+
+      </section>
+
+      <section className="upload-placeholder">
+        <h2>Revivez les souvenirs</h2>
+
+        <p className="welcome-message">
+          Retrouvez les photos partagées par tous les invités
+          et téléchargez celles que vous souhaitez conserver.
+        </p>
+
+        <button
+          type="button"
+          className="choose-photos-button"
+          onClick={() => window.open(API_URL, "_blank", "noopener,noreferrer")}
+        >
+          Découvrir les photos du mariage
+        </button>
       </section>
     </main>
+
   );
 }
 
