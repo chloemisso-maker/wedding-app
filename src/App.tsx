@@ -138,7 +138,7 @@ function App() {
 
         <h1>Merci d'avoir partagé cette journée avec nous</h1>
 
-        <p className="welcome-heart">♥</p>
+        <p className="welcome-heart">♥︎</p>
 
 
       </section>
