@@ -138,7 +138,17 @@ function App() {
 
         <h1>Merci d'avoir partagé cette journée avec nous</h1>
 
-        <p className="welcome-heart">♥︎</p>
+        <svg
+          className="welcome-heart"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path
+            d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"
+            fill="#f5f5dc"
+          />
+        </svg>
 
 
       </section>

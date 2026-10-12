@@ -98,9 +98,11 @@ button {
 }
 
 .welcome-heart {
-  color: #f5f5dc;
-  font-size: 1.6rem;
+  display: block;
+  width: 26px;
+  height: 26px;
   margin: 18px 0;
+  color: #f5f5dc;
 }
 
 .welcome-message {
