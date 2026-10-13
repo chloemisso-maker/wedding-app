@@ -183,14 +183,17 @@ const totalBytes = optimizedFiles.reduce(
   0
 );
 
+
 const totalMB = (totalBytes / (1024 * 1024)).toFixed(2);
 
-setStatus(`Photos optimisées : environ ${totalMB} Mo au total. Envoi en cours…`);
-      let nextIndex = 0;
-      let completed = 0;
-      const total = optimizedFiles.length;
+let nextIndex = 0;
+let completed = 0;
+const total = optimizedFiles.length;
 
-      setStatus(`Envoi de ${total} photo(s)…`);
+setStatus(
+  `Photos optimisées : ${totalMB} Mo au total. Envoi de 0/${total} photos…`
+);
+
 
       // Trois envois peuvent fonctionner en parallèle.
       async function uploadWorker() {
@@ -210,7 +213,9 @@ setStatus(`Photos optimisées : environ ${totalMB} Mo au total. Envoi en cours�
           });
 
           completed++;
-          setStatus(`Envoi en cours… ${completed}/${total} photos`);
+          setStatus(
+  `Photos optimisées : ${totalMB} Mo. Envoi en cours… ${completed}/${total} photos`
+);
         }
       }
 
