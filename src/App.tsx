@@ -9,7 +9,70 @@ const MAX_FILES = 10;
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const MAX_TOTAL_SIZE = 30 * 1024 * 1024;
 
-function fileToBase64(file: File): Promise<string> {
+
+async function optimizeImage(file: File): Promise<{
+  blob: Blob;
+  name: string;
+  mimeType: string;
+}> {
+  // Les formats particuliers sont conservés tels quels.
+  if (
+    file.type === "image/gif" ||
+    file.type === "image/svg+xml"
+  ) {
+    return { blob: file, name: file.name, mimeType: file.type };
+  }
+
+  try {
+    const bitmap = await createImageBitmap(file);
+    const maxDimension = 2000;
+    const scale = Math.min(
+      1,
+      maxDimension / Math.max(bitmap.width, bitmap.height)
+    );
+
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(bitmap.width * scale);
+    canvas.height = Math.round(bitmap.height * scale);
+
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("Canvas indisponible");
+
+    context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    bitmap.close();
+
+    const outputType =
+      file.type === "image/png" ? "image/png" : "image/jpeg";
+
+    const blob = await new Promise<Blob>((resolve, reject) => {
+      canvas.toBlob(
+        (result) => {
+          if (result) resolve(result);
+          else reject(new Error("Compression impossible"));
+        },
+        outputType,
+        0.82
+      );
+    });
+
+    // Si la compression n'apporte rien, garder le fichier original.
+    if (blob.size >= file.size) {
+      return { blob: file, name: file.name, mimeType: file.type };
+    }
+
+    const name =
+      outputType === "image/jpeg"
+        ? file.name.replace(/\.[^.]+$/, "") + ".jpg"
+        : file.name;
+
+    return { blob, name, mimeType: outputType };
+  } catch {
+    // Si le navigateur ne sait pas décoder le format, on conserve l'original.
+    return { blob: file, name: file.name, mimeType: file.type };
+  }
+}
+
+function fileToBase64(file: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
@@ -24,6 +87,7 @@ function fileToBase64(file: File): Promise<string> {
     reader.readAsDataURL(file);
   });
 }
+
 
 function App() {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -101,13 +165,21 @@ function App() {
     setStatus("Préparation de vos photos…");
 
     try {
-      const files = await Promise.all(
-        selectedFiles.map(async (file) => ({
-          name: file.name,
-          mimeType: file.type,
-          data: await fileToBase64(file),
-        }))
-      );
+      
+setStatus("Optimisation de vos photos…");
+
+const files = await Promise.all(
+  selectedFiles.map(async (file) => {
+    const optimized = await optimizeImage(file);
+
+    return {
+      name: optimized.name,
+      mimeType: optimized.mimeType,
+      data: await fileToBase64(optimized.blob),
+    };
+  })
+);
+
 
       setStatus("Envoi en cours…");
 
