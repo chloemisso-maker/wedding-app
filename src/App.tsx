@@ -159,83 +159,94 @@ function App() {
   }
 
 
-  async function handleUpload() {
-    if (selectedFiles.length === 0 || isUploading) return;
+  
+async function handleUpload() {
+  if (selectedFiles.length === 0 || isUploading) return;
 
-    setIsUploading(true);
-    setStatus("Optimisation des photos…");
+  setIsUploading(true);
+  setStatus("Optimisation des photos…");
 
-    try {
-      // Optimiser toutes les photos avant de commencer les envois.
-      const optimizedFiles = await Promise.all(
-        selectedFiles.map(async (file) => {
-          const optimized = await optimizeImage(file);
+  try {
+    // 1. Optimiser les photos et les préparer pour l'envoi
+    const optimizedFiles = await Promise.all(
+      selectedFiles.map(async (file) => {
+        const optimized = await optimizeImage(file);
 
-          return {
-            name: optimized.name,
-            mimeType: optimized.mimeType,
-            data: await fileToBase64(optimized.blob),
-          };
-        })
-      );
-const totalBytes = optimizedFiles.reduce(
-  (sum, file) => sum + (file.data.length * 3) / 4,
-  0
-);
+        return {
+          name: optimized.name,
+          mimeType: optimized.mimeType,
+          data: await fileToBase64(optimized.blob),
+        };
+      })
+    );
 
+    const totalBytes = optimizedFiles.reduce(
+      (sum, file) => sum + (file.data.length * 3) / 4,
+      0
+    );
 
-const totalMB = (totalBytes / (1024 * 1024)).toFixed(2);
+    const totalMB = (totalBytes / (1024 * 1024)).toFixed(2);
+    const total = optimizedFiles.length;
 
-let nextIndex = 0;
-let completed = 0;
-const total = optimizedFiles.length;
+    // 2. Regrouper les photos par lots de 3
+    const batchSize = 3;
+    const batches: (typeof optimizedFiles)[] = [];
 
-setStatus(
-  `Photos optimisées : ${totalMB} Mo au total. Envoi de 0/${total} photos…`
-);
-
-
-      // Trois envois peuvent fonctionner en parallèle.
-      async function uploadWorker() {
-        while (true) {
-          const index = nextIndex++;
-          if (index >= total) return;
-
-          const file = optimizedFiles[index];
-
-          await fetch(API_URL, {
-            method: "POST",
-            mode: "no-cors",
-            headers: {
-              "Content-Type": "text/plain;charset=UTF-8",
-            },
-            body: JSON.stringify({ files: [file] }),
-          });
-
-          completed++;
-          setStatus(
-  `Photos optimisées : ${totalMB} Mo. Envoi en cours… ${completed}/${total} photos`
-);
-        }
-      }
-
-      await Promise.all(
-        Array.from(
-          { length: Math.min(3, total) },
-          () => uploadWorker()
-        )
-      );
-
-      setStatus("Envoi terminé ! Merci pour vos photos.");
-      setSelectedFiles([]);
-    } catch {
-      setStatus(
-        "Un envoi a échoué. Vérifiez votre connexion et le dossier Google Drive avant de réessayer."
-      );
-    } finally {
-      setIsUploading(false);
+    for (let i = 0; i < total; i += batchSize) {
+      batches.push(optimizedFiles.slice(i, i + batchSize));
     }
+
+    let nextBatch = 0;
+    let completed = 0;
+
+    setStatus(
+      `Photos optimisées : ${totalMB} Mo. Envoi de 0/${total} photos…`
+    );
+
+    // 3. Envoyer plusieurs lots en parallèle
+    async function uploadWorker() {
+      while (true) {
+        const batchIndex = nextBatch++;
+
+        if (batchIndex >= batches.length) return;
+
+        const batch = batches[batchIndex];
+
+        await fetch(API_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: {
+            "Content-Type": "text/plain;charset=UTF-8",
+          },
+          body: JSON.stringify({ files: batch }),
+        });
+
+        completed += batch.length;
+
+        setStatus(
+          `Photos optimisées : ${totalMB} Mo. Envoi en cours… ${completed}/${total} photos`
+        );
+      }
+    }
+
+    await Promise.all(
+      Array.from(
+        { length: Math.min(3, batches.length) },
+        () => uploadWorker()
+      )
+    );
+
+    setStatus("Envoi terminé ! Merci pour vos photos.");
+    setSelectedFiles([]);
+  } catch {
+    setStatus(
+      "Un envoi a échoué. Vérifiez votre connexion puis réessayez."
+    );
+  } finally {
+    setIsUploading(false);
   }
+}
+
 
 
   return (
