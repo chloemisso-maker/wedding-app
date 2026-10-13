@@ -158,50 +158,73 @@ function App() {
     setStatus("");
   }
 
+
   async function handleUpload() {
     if (selectedFiles.length === 0 || isUploading) return;
 
     setIsUploading(true);
-    setStatus("Préparation de vos photos…");
+    setStatus("Optimisation des photos…");
 
     try {
-      
-setStatus("Optimisation de vos photos…");
+      // Optimiser toutes les photos avant de commencer les envois.
+      const optimizedFiles = await Promise.all(
+        selectedFiles.map(async (file) => {
+          const optimized = await optimizeImage(file);
 
-const files = await Promise.all(
-  selectedFiles.map(async (file) => {
-    const optimized = await optimizeImage(file);
+          return {
+            name: optimized.name,
+            mimeType: optimized.mimeType,
+            data: await fileToBase64(optimized.blob),
+          };
+        })
+      );
 
-    return {
-      name: optimized.name,
-      mimeType: optimized.mimeType,
-      data: await fileToBase64(optimized.blob),
-    };
-  })
-);
+      let nextIndex = 0;
+      let completed = 0;
+      const total = optimizedFiles.length;
 
+      setStatus(`Envoi de ${total} photo(s)…`);
 
-      setStatus("Envoi en cours…");
+      // Trois envois peuvent fonctionner en parallèle.
+      async function uploadWorker() {
+        while (true) {
+          const index = nextIndex++;
+          if (index >= total) return;
 
-      await fetch(API_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: {
-          "Content-Type": "text/plain;charset=UTF-8",
-        },
-        body: JSON.stringify({ files }),
-      });
+          const file = optimizedFiles[index];
 
-      setStatus("Vos photos ont bien été envoyées. Merci !");
+          await fetch(API_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: {
+              "Content-Type": "text/plain;charset=UTF-8",
+            },
+            body: JSON.stringify({ files: [file] }),
+          });
+
+          completed++;
+          setStatus(`Envoi en cours… ${completed}/${total} photos`);
+        }
+      }
+
+      await Promise.all(
+        Array.from(
+          { length: Math.min(3, total) },
+          () => uploadWorker()
+        )
+      );
+
+      setStatus("Envoi terminé ! Merci pour vos photos.");
       setSelectedFiles([]);
     } catch {
       setStatus(
-        "L'envoi a échoué. Vérifiez votre connexion puis réessayez."
+        "Un envoi a échoué. Vérifiez votre connexion et le dossier Google Drive avant de réessayer."
       );
     } finally {
       setIsUploading(false);
     }
   }
+
 
   return (
     <main className="home-page">
