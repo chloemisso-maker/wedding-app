@@ -178,7 +178,14 @@ function App() {
           };
         })
       );
+const totalBytes = optimizedFiles.reduce(
+  (sum, file) => sum + (file.data.length * 3) / 4,
+  0
+);
 
+const totalMB = (totalBytes / (1024 * 1024)).toFixed(2);
+
+setStatus(`Photos optimisées : environ ${totalMB} Mo au total. Envoi en cours…`);
       let nextIndex = 0;
       let completed = 0;
       const total = optimizedFiles.length;
