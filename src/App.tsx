@@ -228,7 +228,7 @@ async function handleUpload() {
     let completed = 0;
 
     setStatus(
-      `Photos optimisées : ${totalMB} Mo. Envoi de 0/${total} photos…`
+      `Envoi de 0/${total} photos…`
     );
 
     // 3. Envoyer plusieurs lots en parallèle
