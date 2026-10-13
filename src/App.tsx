@@ -10,67 +10,95 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const MAX_TOTAL_SIZE = 30 * 1024 * 1024;
 
 
+
 async function optimizeImage(file: File): Promise<{
   blob: Blob;
   name: string;
   mimeType: string;
 }> {
-  // Les formats particuliers sont conservés tels quels.
+  // Conserver les GIF animés et les SVG tels quels.
   if (
     file.type === "image/gif" ||
     file.type === "image/svg+xml"
   ) {
-    return { blob: file, name: file.name, mimeType: file.type };
+    return {
+      blob: file,
+      name: file.name,
+      mimeType: file.type,
+    };
   }
 
   try {
     const bitmap = await createImageBitmap(file);
-    const maxDimension = 2000;
+
+    // Limiter le grand côté à 1800 pixels.
+    const maxDimension = 1800;
     const scale = Math.min(
       1,
       maxDimension / Math.max(bitmap.width, bitmap.height)
     );
 
     const canvas = document.createElement("canvas");
-    canvas.width = Math.round(bitmap.width * scale);
-    canvas.height = Math.round(bitmap.height * scale);
+    canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
 
     const context = canvas.getContext("2d");
-    if (!context) throw new Error("Canvas indisponible");
 
+    if (!context) {
+      bitmap.close();
+      throw new Error("Canvas indisponible");
+    }
+
+    // Fond blanc pour éviter les transparences noires en JPEG.
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, canvas.width, canvas.height);
     context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
     bitmap.close();
 
-    const outputType =
-      file.type === "image/png" ? "image/png" : "image/jpeg";
+    // Les photos de téléphone sont converties en JPEG compressé.
+    const outputType = "image/jpeg";
 
     const blob = await new Promise<Blob>((resolve, reject) => {
       canvas.toBlob(
         (result) => {
-          if (result) resolve(result);
-          else reject(new Error("Compression impossible"));
+          if (result) {
+            resolve(result);
+          } else {
+            reject(new Error("Compression impossible"));
+          }
         },
         outputType,
-        0.82
+        0.75
       );
     });
 
-    // Si la compression n'apporte rien, garder le fichier original.
+    // Si le résultat n'est pas plus léger, garder l'original.
     if (blob.size >= file.size) {
-      return { blob: file, name: file.name, mimeType: file.type };
+      return {
+        blob: file,
+        name: file.name,
+        mimeType: file.type,
+      };
     }
 
     const name =
-      outputType === "image/jpeg"
-        ? file.name.replace(/\.[^.]+$/, "") + ".jpg"
-        : file.name;
+      file.name.replace(/\.[^.]+$/, "") + ".jpg";
 
-    return { blob, name, mimeType: outputType };
+    return {
+      blob,
+      name,
+      mimeType: outputType,
+    };
   } catch {
-    // Si le navigateur ne sait pas décoder le format, on conserve l'original.
-    return { blob: file, name: file.name, mimeType: file.type };
+    // En cas de problème de décodage, garder le fichier original.
+    return {
+      blob: file,
+      name: file.name,
+      mimeType: file.type,
+    };
   }
 }
+
 
 function fileToBase64(file: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
